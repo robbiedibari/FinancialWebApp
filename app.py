@@ -1,8 +1,8 @@
-from flask import Flask, render_template, url_for, redirect,flash
+from flask import Flask, render_template, url_for, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField,EmailField, TelField, validators
+from wtforms import StringField, PasswordField, SubmitField, EmailField, TelField, validators
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 import os
@@ -11,6 +11,7 @@ import os
 # Define your User model outside of create_app
 db = SQLAlchemy()  # Define SQLAlchemy instance here
 bcrypt = Bcrypt()
+
 
 def create_app():
     app = Flask(__name__)
@@ -32,6 +33,7 @@ def create_app():
     @app.route('/')
     def home():
         return render_template('home.html')
+
     @app.route('/logout')
     @login_required
     def logout():
@@ -42,10 +44,13 @@ def create_app():
     def login():
         form = LoginForm()
         if form.validate_on_submit():
-            user = User.query.filter_by(username=form.username.data).first()
+            user = User.query.filter_by(email=form.email.data).first()
             if user and bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
+                flash('Login successful', 'success')
                 return redirect(url_for('dashboard'))
+            else:
+                flash('Login unsuccessful, Please check your username and passoword')
         return render_template('login.html', form=form)
 
     @app.route('/dashboard', methods=['GET', 'POST'])
@@ -63,7 +68,8 @@ def create_app():
         if form.validate_on_submit():
             print('Form Submitted Successfully')
             try:
-                hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+                hashed_password = bcrypt.generate_password_hash(
+                    form.password.data).decode('utf-8')
                 new_user = User(
                     username=form.username.data,
                     email=form.email.data,
@@ -79,7 +85,8 @@ def create_app():
 
             except Exception as e:
                 db.session.rollback()
-                flash('An error occurred during registration. Please try again.', 'danger')
+                flash(
+                    'An error occurred during registration. Please try again.', 'danger')
                 print(f"Error: {e}")
         else:
             print('Form did not validate!')
@@ -87,39 +94,49 @@ def create_app():
 
     return app
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(20), nullable=False, unique = True)
+    email = db.Column(db.String(20), nullable=False, unique=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    first_name = db.Column(db.String(20), nullable= False)
-    last_name = db.Column(db.String(20), nullable = False)
+    first_name = db.Column(db.String(20), nullable=False)
+    last_name = db.Column(db.String(20), nullable=False)
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', [validators.DataRequired(), validators.Length(min=4, max=25)])
-    email = EmailField('Email', [validators.DataRequired(), validators.Email()])
-    password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=6)])
-    confirm_password = PasswordField('Confirm Password', [validators.DataRequired(), validators.EqualTo('password', message='Passwords must match')])
+    username = StringField(
+        'Username', [validators.DataRequired(), validators.Length(min=4, max=25)])
+    email = EmailField(
+        'Email', [validators.DataRequired(), validators.Email()])
+    password = PasswordField(
+        'Password', [validators.DataRequired(), validators.Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', [validators.DataRequired(
+    ), validators.EqualTo('password', message='Passwords must match')])
     first_name = StringField('First Name', [validators.DataRequired()])
     last_name = StringField('Last Name', [validators.DataRequired()])
     submit = SubmitField('Register')
 
-
     def validate_email(self, email):
-        existing_user_email = User.query.filter_by(email = email.data).first()
+        existing_user_email = User.query.filter_by(email=email.data).first()
         if existing_user_email:
             raise ValidationError(
                 'Email already exists. Please Choose a different one.'
             )
 
+
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min = 4, max=20)], render_kw={'placeholder' : 'Username'})
-    password = PasswordField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={'placeholder': 'password'})
-    email = EmailField('Email', [validators.DataRequired()])
+    email = EmailField(
+        'Email', 
+        validators=[InputRequired(), Length(max=50), validators.Email()],
+        render_kw={'placeholder': 'Email'}
+    )
+    password = PasswordField(validators=[InputRequired(), Length(
+        min=4, max=20)], render_kw={'placeholder': 'password'})
+  
     submit = SubmitField('Login Now')
 
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(port=5001,debug=True)
+    app.run(port=5001, debug=True)
