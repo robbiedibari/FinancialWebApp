@@ -80,7 +80,6 @@ def create_app():
                 db.session.add(new_user)
                 db.session.commit()
                 login_user(new_user)
-                flash('Your account has been created!', 'success')
                 return redirect(url_for('dashboard'))
 
             except Exception as e:
