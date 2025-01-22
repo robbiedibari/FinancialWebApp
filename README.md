@@ -1,4 +1,4 @@
-# 📊 FinancialWebApp
+# 📊 Budget Brain
 **Keep track of your finances with ease!**
 
 FinancialWebApp is a web application designed to help users manage their personal finances effectively. With features like expense tracking, income management, and insightful analytics, this app provides a simple yet powerful way to stay on top of your financial goals.
