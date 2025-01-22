@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - Expense Tracker</title>
-  <link href="{{ url_for('static', filename='css/tailwind_output.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='dist/css/output.css') }}" rel="stylesheet">
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
   <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -14,10 +14,16 @@
     <form method="POST" action="{{ url_for('register') }}" class="space-y-4">
       {{ form.hidden_tag() }}
       
-      <!-- Username Field -->
+           <!-- First Name Field -->
+        <div>
+          {{ form.first_name(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="First Name") }}
+        </div>
+          
+          <!-- Last Name Field -->
       <div>
-        {{ form.username(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Username") }}
+        {{ form.last_name(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Last Name") }}
       </div>
+          
       
       <!-- Email Field -->
       <div>
@@ -34,16 +40,7 @@
         {{ form.confirm_password(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Confirm Password") }}
       </div>
       
-      <!-- First Name Field -->
-      <div>
-        {{ form.first_name(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="First Name") }}
-      </div>
-      
-      <!-- Last Name Field -->
-      <div>
-        {{ form.last_name(class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder="Last Name") }}
-      </div>
-      
+ 
       <!-- Submit Button -->
       <div>
         <button 
